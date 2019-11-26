@@ -4,10 +4,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 /**
  * @author Mickael Clavreul
  */
 @Entity
+@Table(name = "Island")
 public class Island {
 	
 	private int id;

@@ -1,15 +1,15 @@
 package monkeys.model;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 /**
  * @author Mickael Clavreul
  */
 @Entity
-public class Element implements Serializable{
+@Table(name = "Element")
+public class Element {
 	private int posX;
 	private int posY;
 	private int id;
