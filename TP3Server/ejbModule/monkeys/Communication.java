@@ -9,7 +9,10 @@ import javax.jms.JMSException;
 import javax.jms.StreamMessage;
 import javax.jms.Topic;
 
+import monkeys.model.Monkey;
 import monkeys.model.Pirate;
+import monkeys.model.Rum;
+import monkeys.model.Treasure;
 
 /**
  * Session Bean implementation class Communication
@@ -38,7 +41,22 @@ public class Communication implements CommunicationLocal {
 	
 	@Override
 	public void sendPirate(Pirate pirate, String id) {
-		
+		sendObjectMessage(pirate, id, "pirate");
+	}
+	
+	@Override
+	public void sendMonkey(Monkey monkey, String id) {
+		sendObjectMessage(monkey, id, "monkey");
+	}
+	
+	@Override
+	public void sendRum(Rum rum, String id) {
+		sendObjectMessage(rum, id, "rum");
+	}
+	
+	@Override
+	public void sendTreasure(Treasure treasure, String id) {
+		sendObjectMessage(treasure, id, "treasure");
 	}
 	
 	
@@ -60,6 +78,14 @@ public class Communication implements CommunicationLocal {
     }
 	
 	private void sendObjectMessage(Object object, String id, String type) {
-		
+		StreamMessage message = context.createStreamMessage();
+		try {
+    		message.setStringProperty("id", id);
+    		message.setJMSType(type);
+    		message.writeObject(object);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+    	context.createProducer().send(topic, message);
 	}
 }
