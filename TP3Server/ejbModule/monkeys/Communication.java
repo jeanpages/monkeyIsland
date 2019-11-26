@@ -9,6 +9,8 @@ import javax.jms.JMSException;
 import javax.jms.StreamMessage;
 import javax.jms.Topic;
 
+import monkeys.model.Pirate;
+
 /**
  * Session Bean implementation class Communication
  */
@@ -34,6 +36,12 @@ public class Communication implements CommunicationLocal {
 		sendIntArrayMessage(map, id, "map");
 	}
 	
+	@Override
+	public void sendPirate(Pirate pirate, String id) {
+		
+	}
+	
+	
 	private void sendIntArrayMessage(int[][] array, String id, String type){
     	StreamMessage message = context.createStreamMessage();
     	try {
@@ -50,4 +58,8 @@ public class Communication implements CommunicationLocal {
 		}
     	context.createProducer().send(topic, message);
     }
+	
+	private void sendObjectMessage(Object object, String id, String type) {
+		
+	}
 }

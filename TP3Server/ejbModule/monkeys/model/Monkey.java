@@ -5,20 +5,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "Monkey")
-public class Monkey {
-	
-	private int idMonkey;
+public class Monkey extends Element {
 
 	public Monkey() {}
 
-	public int getIdMonkey() {
-		return idMonkey;
+	@Override
+	public String toString() {
+		return "Monkey [getId()=" + getId() + ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
 	}
-
-	public void setIdMonkey(int idMonkey) {
-		this.idMonkey = idMonkey;
-	}
-	
-	
-
 }

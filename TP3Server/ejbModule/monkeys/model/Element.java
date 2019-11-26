@@ -9,13 +9,27 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "Element")
-public class Element {
+public abstract class Element {
+	
+	private int id;
 	private int posX;
 	private int posY;
-	private int id;
 	
 	public Element() {}
 
+	/**
+	 * @return the id
+	 */
+	@Id
+	@GeneratedValue
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	/**
 	 * @return posX
 	 */
@@ -36,18 +50,5 @@ public class Element {
 
 	public void setPosY(int posY) {
 		this.posY = posY;
-	}
-
-	/**
-	 * @return the id
-	 */
-	@Id
-	@GeneratedValue
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 }

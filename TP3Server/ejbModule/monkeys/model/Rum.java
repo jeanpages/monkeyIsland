@@ -1,7 +1,6 @@
 package monkeys.model;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
@@ -11,27 +10,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="Rum")
-public class Rum {
+public class Rum extends Element {
 
-	private int idRum;
 	private boolean hidden;
 	private int energy;
 	
-	
 	public Rum() {}
-	
-	/**
-	 * 
-	 * @return idRum
-	 */
-	@Id
-	public int getIdRum() {
-		return idRum;
-	}
-	
-	public void setIdRum(int idRum) {
-		this.idRum = idRum;
-	}
 	
 	/**
 	 * 
@@ -61,10 +45,9 @@ public class Rum {
 
 	@Override
 	public String toString() {
-		return "Rum [idRum=" + idRum + ", hidden=" + hidden + ", energy=" + energy + "]";
+		return "Rum [isHidden()=" + isHidden() + ", getEnergy()=" + getEnergy() + ", getId()=" + getId()
+				+ ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
 	}
-	
-	
 	
 	
 }

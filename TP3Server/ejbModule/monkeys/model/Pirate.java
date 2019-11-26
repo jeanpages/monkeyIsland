@@ -2,28 +2,17 @@ package monkeys.model;
 
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "Pirate")
-public class Pirate {
+public class Pirate extends Element {
 	
-	private int idPirate;
 	private String avatar;
 	private State status;
 	private int energy;
 	
 	public Pirate() {}
-
-	@Id
-	public int getIdPirate() {
-		return idPirate;
-	}
-
-	public void setIdPirate(int idPirate) {
-		this.idPirate = idPirate;
-	}
 
 	public String getAvatar() {
 		return avatar;
@@ -48,4 +37,12 @@ public class Pirate {
 	public void setEnergy(int energy) {
 		this.energy = energy;
 	}
+
+	@Override
+	public String toString() {
+		return "Pirate [getAvatar()=" + getAvatar() + ", getStatus()=" + getStatus() + ", getEnergy()=" + getEnergy()
+				+ ", getId()=" + getId() + ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
+	}
+	
+	
 }
