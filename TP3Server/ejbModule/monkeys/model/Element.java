@@ -1,4 +1,4 @@
-package monkeys;
+package monkeys.model;
 
 import java.io.Serializable;
 

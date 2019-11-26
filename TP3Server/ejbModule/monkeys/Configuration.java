@@ -7,6 +7,8 @@ import java.util.Properties;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 
+import monkeys.model.Island;
+
 /**
  * Session Bean implementation class Configuration
  */

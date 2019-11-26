@@ -9,6 +9,8 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import monkeys.model.Island;
+
 /**
  * Session Bean implementation class MonkeyIsland
  * @author Mickael Clavreul
