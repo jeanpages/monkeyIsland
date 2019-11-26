@@ -114,5 +114,4 @@ public class Configuration implements ConfigurationLocal {
 		treasure.setVisible(false);
 		return treasure;
 	}
-
 }

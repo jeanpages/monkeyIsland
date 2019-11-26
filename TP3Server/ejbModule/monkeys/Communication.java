@@ -84,7 +84,7 @@ public class Communication implements CommunicationLocal {
 		try {
     		message.setStringProperty("id", id);
     		message.setJMSType(type);
-    		message.setObject(element);;
+    		message.setObject(element);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
