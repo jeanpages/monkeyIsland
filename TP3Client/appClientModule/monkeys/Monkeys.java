@@ -11,6 +11,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.Topic;
@@ -26,6 +27,10 @@ import org.jboss.ejb.client.remoting.ConfigBasedEJBClientContextSelector;
 import guybrush.view.Fenetre;
 import guybrush.view.GameObserver;
 import monkeys.MIRemote;
+import monkeys.model.Monkey;
+import monkeys.model.Pirate;
+import monkeys.model.Rum;
+import monkeys.model.Treasure;
 
 /**
  * @author Mickael Clavreul
@@ -44,12 +49,13 @@ public class Monkeys implements MessageListener, GameObserver {
 		fenetre = new Fenetre("MonkeysIsland");
 
 		instance = new Monkeys();
+		System.out.println(instance.hashCode());
 		
 		connection = subscribeTopic();
 		
 		MIRemote miremote = lookup("ejb:/TP3Server/MonkeyIsland!monkeys.MIRemote?stateful");
 		
-		miremote.subscribe("1");
+		miremote.subscribe(String.valueOf(instance.hashCode()));
 		
 		fenetre.addObserver(instance);
 		
@@ -118,17 +124,47 @@ public class Monkeys implements MessageListener, GameObserver {
 	@Override
 	public void onMessage(Message arg0) {
 		try {
-			StreamMessage message = (StreamMessage) arg0;
+			StreamMessage streamMessage;
+			ObjectMessage objectMessage;
 			
-			if ("map".equals(message.getJMSType())) {
-				int arrayLength = message.readInt();
-				matrix = new int[arrayLength][arrayLength];
-				for (int i = 0; i < arrayLength; i++) {
-					for (int j = 0; j < arrayLength; j++) {
-						matrix[i][j] = message.readInt();
+			switch (arg0.getJMSType()) {
+				case "map":
+					streamMessage = (StreamMessage) arg0;
+					int arrayLength = streamMessage.readInt();
+					matrix = new int[arrayLength][arrayLength];
+					for (int i = 0; i < arrayLength; i++) {
+						for (int j = 0; j < arrayLength; j++) {
+							matrix[i][j] = streamMessage.readInt();
+						}
 					}
-				}
-				createMap();
+					createMap();
+					break;
+				case "pirate":
+					objectMessage = (ObjectMessage) arg0;
+					Pirate pirate = (Pirate) objectMessage.getObject();
+					fenetre.ajoutPirate(pirate.getId(), pirate.getPosX(), pirate.getPosY(), pirate.getAvatar(), pirate.getEnergy());
+					fenetre.repaint();
+					break;
+				case "rum":
+					objectMessage = (ObjectMessage) arg0;
+					Rum rum = (Rum) objectMessage.getObject();
+					fenetre.creationRhum(rum.getPosX(), rum.getPosY(), rum.isVisible());
+					fenetre.repaint();
+					break;
+				case "treasure":
+					objectMessage = (ObjectMessage) arg0;
+					Treasure treasure = (Treasure) objectMessage.getObject();
+					fenetre.creationTresor(treasure.getPosX(), treasure.getPosY(), treasure.isVisible());
+					fenetre.repaint();
+					break;
+				case "monkey":
+					objectMessage = (ObjectMessage) arg0;
+					Monkey monkey = (Monkey) objectMessage.getObject();
+					fenetre.creationEMonkey(monkey.getId(), monkey.getPosX(), monkey.getPosY());
+					fenetre.repaint();
+					break;
+				default:
+					break;
 			}
 		} catch (JMSException e) {
 			e.printStackTrace();

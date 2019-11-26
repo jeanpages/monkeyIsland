@@ -6,9 +6,11 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
+import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
 import javax.jms.Topic;
 
+import monkeys.model.Element;
 import monkeys.model.Monkey;
 import monkeys.model.Pirate;
 import monkeys.model.Rum;
@@ -41,22 +43,22 @@ public class Communication implements CommunicationLocal {
 	
 	@Override
 	public void sendPirate(Pirate pirate, String id) {
-		sendObjectMessage(pirate, id, "pirate");
+		sendElementMessage(pirate, id, "pirate");
 	}
 	
 	@Override
 	public void sendMonkey(Monkey monkey, String id) {
-		sendObjectMessage(monkey, id, "monkey");
+		sendElementMessage(monkey, id, "monkey");
 	}
 	
 	@Override
 	public void sendRum(Rum rum, String id) {
-		sendObjectMessage(rum, id, "rum");
+		sendElementMessage(rum, id, "rum");
 	}
 	
 	@Override
 	public void sendTreasure(Treasure treasure, String id) {
-		sendObjectMessage(treasure, id, "treasure");
+		sendElementMessage(treasure, id, "treasure");
 	}
 	
 	
@@ -77,12 +79,12 @@ public class Communication implements CommunicationLocal {
     	context.createProducer().send(topic, message);
     }
 	
-	private void sendObjectMessage(Object object, String id, String type) {
-		StreamMessage message = context.createStreamMessage();
+	private void sendElementMessage(Element element, String id, String type) {
+		ObjectMessage message = context.createObjectMessage();
 		try {
     		message.setStringProperty("id", id);
     		message.setJMSType(type);
-    		message.writeObject(object);
+    		message.setObject(element);;
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

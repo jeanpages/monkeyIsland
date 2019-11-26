@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Table(name="Rum")
 public class Rum extends Element {
 
-	private boolean hidden;
+	private boolean visible;
 	private int energy;
 	
 	public Rum() {}
@@ -21,13 +21,13 @@ public class Rum extends Element {
 	 * 
 	 * @return hidden
 	 */
-	public boolean isHidden() {
-		return hidden;
+	public boolean isVisible() {
+		return visible;
 	}
 	
 	
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class Rum extends Element {
 
 	@Override
 	public String toString() {
-		return "Rum [isHidden()=" + isHidden() + ", getEnergy()=" + getEnergy() + ", getId()=" + getId()
+		return "Rum [isHidden()=" + isVisible() + ", getEnergy()=" + getEnergy() + ", getId()=" + getId()
 				+ ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
 	}
 	

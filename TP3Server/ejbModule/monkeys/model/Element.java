@@ -1,5 +1,7 @@
 package monkeys.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,7 +11,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "Element")
-public abstract class Element {
+public abstract class Element implements Serializable {
 	
 	private int id;
 	private int posX;

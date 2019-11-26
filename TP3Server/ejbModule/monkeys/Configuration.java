@@ -96,7 +96,7 @@ public class Configuration implements ConfigurationLocal {
 		rum.setEnergy(Integer.parseInt(energieProperty));
 		rum.setPosX(Integer.parseInt(posXProperty));
 		rum.setPosY(Integer.parseInt(posYProperty));
-		rum.setHidden(false);
+		rum.setVisible(true);
 		return rum;
 	}
 
@@ -111,7 +111,7 @@ public class Configuration implements ConfigurationLocal {
 		Treasure treasure = new Treasure();
 		treasure.setPosX(Integer.parseInt(posXProperty));
 		treasure.setPosY(Integer.parseInt(posYProperty));
-		treasure.setHidden(true);
+		treasure.setVisible(false);
 		return treasure;
 	}
 
