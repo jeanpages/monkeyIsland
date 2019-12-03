@@ -31,7 +31,7 @@ public class Island {
 	private Rum rum;
 	private Treasure treasure;
 	
-	@OneToMany(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	public List<Monkey> getMonkeys(){
 		return monkeys;
 	}
@@ -40,7 +40,7 @@ public class Island {
 		this.monkeys = monkeys;
 	}
 	
-	@OneToMany(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	public List<Pirate> getPirates(){
 		return pirates;
 	}
@@ -49,7 +49,7 @@ public class Island {
 		this.pirates = pirates;
 	}
 	
-	@OneToOne(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	public Rum getRum(){
 		return rum;
 	}
@@ -58,7 +58,7 @@ public class Island {
 		this.rum = rum;
 	}
 	
-	@OneToOne(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	public Treasure getTreasure(){
 		return treasure;
 	}
