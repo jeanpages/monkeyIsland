@@ -1,9 +1,16 @@
 package monkeys.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 /**
  * @author Mickael Clavreul
@@ -17,6 +24,47 @@ public class Island {
 
 	public Island() {
 		this.map = null;
+	}
+	
+	private List<Monkey> monkeys = new ArrayList<>();
+	private List<Pirate> pirates = new ArrayList<>();
+	private Rum rum;
+	private Treasure treasure;
+	
+	@OneToMany(mappedBy="Monkey", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	public List<Monkey> getMonkeys(){
+		return monkeys;
+	}
+	
+	public void setMonkeys(List<Monkey> monkeys) {
+		this.monkeys = monkeys;
+	}
+	
+	@OneToMany(mappedBy="Pirate", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	public List<Pirate> getPirates(){
+		return pirates;
+	}
+	
+	public void setPirates(List<Pirate> pirates) {
+		this.pirates = pirates;
+	}
+	
+	@OneToOne(mappedBy="Rum", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	public Rum getRum(){
+		return rum;
+	}
+	
+	public void setRum(Rum rum) {
+		this.rum = rum;
+	}
+	
+	@OneToOne(mappedBy="Treasure", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	public Treasure getTreasure(){
+		return treasure;
+	}
+	
+	public void setTreasure(Treasure treasure) {
+		this.treasure = treasure;
 	}
 
 	/**

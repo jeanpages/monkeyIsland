@@ -1,6 +1,8 @@
 package monkeys.model;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -14,6 +16,18 @@ public class Rum extends Element {
 
 	private boolean visible;
 	private int energy;
+	
+	private Island island;
+
+	@OneToOne
+	@JoinColumn(name="ISLAND_ID")
+	public Island getIsland() {
+		return this.island;
+	}
+	
+	public void setIsland(Island island) {
+		this.island = island;
+	}
 	
 	public Rum() {}
 	

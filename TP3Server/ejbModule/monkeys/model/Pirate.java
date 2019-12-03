@@ -2,6 +2,8 @@ package monkeys.model;
 
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -11,6 +13,18 @@ public class Pirate extends Element {
 	private String avatar;
 	private State status;
 	private int energy;
+	
+	private Island island;
+
+	@ManyToOne
+	@JoinColumn(name="ISLAND_ID")
+	public Island getIsland() {
+		return this.island;
+	}
+	
+	public void setIsland(Island island) {
+		this.island = island;
+	}
 	
 	public Pirate() {}
 
