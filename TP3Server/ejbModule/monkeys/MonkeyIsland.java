@@ -115,6 +115,9 @@ public class MonkeyIsland implements MIRemote {
 			manager.persist(myPirate);
 		}
 		
+		myLand.getMonkeys().add(monkey);
+		myLand.getPirates().add(myPirate);
+		
 		com.sendMap(myLand.getMap(), String.valueOf(myLand.getId()));
 		com.sendMonkey(monkey, String.valueOf(monkey.getId()));
 		com.sendPirate(myPirate, String.valueOf(myPirate.getId()));
