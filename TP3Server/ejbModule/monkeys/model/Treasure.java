@@ -21,6 +21,15 @@ public class Treasure extends Element{
 	
 	public Treasure() {}
 	
+	public Island getIsland() {
+		return this.island;
+	}
+	
+	public void setIsland(Island island) {
+		this.island = island;
+	}
+	
+	
 	/**
 	 * 
 	 * @return hidden

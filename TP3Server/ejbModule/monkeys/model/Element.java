@@ -53,4 +53,11 @@ public abstract class Element implements Serializable {
 	public void setPosY(int posY) {
 		this.posY = posY;
 	}
+
+	@Override
+	public String toString() {
+		return "Element [id=" + id + ", posX=" + posX + ", posY=" + posY + "]";
+	}
+	
+	
 }

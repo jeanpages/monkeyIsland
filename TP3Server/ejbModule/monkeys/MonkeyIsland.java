@@ -1,6 +1,7 @@
 package monkeys;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
@@ -8,7 +9,9 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
+import monkeys.model.Element;
 import monkeys.model.Island;
 import monkeys.model.Monkey;
 import monkeys.model.Pirate;
@@ -62,29 +65,29 @@ public class MonkeyIsland implements MIRemote {
 		} else {
 			myLand = config.getMap("monkeys.properties");
 			myLand.setId(Integer.valueOf(name));
-			
+			rum = config.getRum("monkeys.properties");
+			rum.setIsland(myLand);
 //			monkey = config.getMonkey("monkeys.properties");
 //			myPirate = config.getPirate("monkeys.properties");
-//			treasure = config.getTreasure("monkeys.properties");
+			treasure = config.getTreasure("monkeys.properties");
+			treasure.setIsland(myLand);
+			manager.persist(rum);
 			manager.persist(myLand);
+			manager.persist(treasure);
+			
+			Query query = manager.createQuery(
+		              "SELECT DISTINCT e FROM Element e, Island i Where i.id = e.island AND i.id =" + Integer.valueOf(name) + " AND TYPE(e) = Rum");
+			List<Element> resultList = query.getResultList();
+		    System.out.println(resultList.size());
 			
 //			manager.persist(myPirate);
-//			manager.persist(treasure);
 //			manager.persist(monkey);
 		}
 		
-		if ((Rum) manager.createQuery("FROM Element WHERE ISLAND_ID = " + name).getSingleResult() != null) {
-			rum = (Rum) manager.createQuery("FROM Element WHERE ISLAND_ID = " + name).getSingleResult();
-		} else {
-			rum = config.getRum("monkeys.properties");
-			rum.setIsland(myLand);
-			manager.persist(rum);
-		}
-
 		com.sendMap(myLand.getMap(), String.valueOf(myLand.getId()));
 //		com.sendMonkey(monkey, String.valueOf(monkey.getId()));
 //		com.sendPirate(myPirate, String.valueOf(myPirate.getId()));
 		com.sendRum(rum, String.valueOf(rum.getId()));
-//		com.sendTreasure(treasure, String.valueOf(treasure.getId()));
+		com.sendTreasure(treasure, String.valueOf(treasure.getId()));
 	}
 }
