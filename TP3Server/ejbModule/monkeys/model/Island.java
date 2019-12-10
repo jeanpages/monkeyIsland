@@ -30,16 +30,16 @@ public class Island implements Serializable {
 		this.map = null;
 	}
 
-	@OneToMany(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="islandMonkey", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	private Collection<Monkey> monkeys = new ArrayList<>();
 
-	@OneToMany(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="islandPirate", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	private Collection<Pirate> pirates = new ArrayList<>();
 
-	@OneToOne(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToOne
 	private Rum rum;
 
-	@OneToOne(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToOne
 	private Treasure treasure;
 	
 	public Collection<Monkey> getMonkeys(){

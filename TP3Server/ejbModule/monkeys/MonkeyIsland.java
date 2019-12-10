@@ -58,35 +58,66 @@ public class MonkeyIsland implements MIRemote {
 
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void newGame(String name) throws IOException {
+		
+		Query queryRum = manager.createQuery(
+	              "SELECT DISTINCT e FROM Element e WHERE TYPE(e) = Rum");
+		
+		
+		if (!queryRum.getResultList().isEmpty()) {
+			rum = (Rum) queryRum.getResultList().get(0);
+		} else {
+			rum = config.getRum("monkeys.properties");
+			manager.persist(rum);
+		}
+		
+		Query queryTreasure = manager.createQuery(
+	              "SELECT DISTINCT e FROM Element e WHERE TYPE(e) = Treasure");
+		
+		
+		if (!queryTreasure.getResultList().isEmpty()) {
+			treasure = (Treasure) queryTreasure.getResultList().get(0);
+		} else {
+			treasure = config.getTreasure("monkeys.properties");
+			manager.persist(treasure);
+		}
+
 		if (manager.find(Island.class, Integer.valueOf(name)) != null) {
-			myLand = manager.find(Island.class, Integer.valueOf(name));
-			
-			
+			myLand = manager.find(Island.class, Integer.valueOf(name));			
 		} else {
 			myLand = config.getMap("monkeys.properties");
 			myLand.setId(Integer.valueOf(name));
-			rum = config.getRum("monkeys.properties");
-			rum.setIsland(myLand);
-//			monkey = config.getMonkey("monkeys.properties");
-//			myPirate = config.getPirate("monkeys.properties");
-			treasure = config.getTreasure("monkeys.properties");
-			treasure.setIsland(myLand);
-			manager.persist(rum);
+			myLand.setRum(rum);
+			myLand.setTreasure(treasure);
 			manager.persist(myLand);
-			manager.persist(treasure);
-			
-			Query query = manager.createQuery(
-		              "SELECT DISTINCT e FROM Element e, Island i Where i.id = e.island AND i.id =" + Integer.valueOf(name) + " AND TYPE(e) = Rum");
-			List<Element> resultList = query.getResultList();
-		    System.out.println(resultList.size());
-			
-//			manager.persist(myPirate);
-//			manager.persist(monkey);
+		}
+		
+		Query queryMonkey = manager.createQuery(
+	              "SELECT DISTINCT e FROM Element e, Island i Where i.id = e.islandMonkey AND i.id =" + Integer.valueOf(name) + " AND TYPE(e) = Monkey");
+		
+		
+		if (!queryMonkey.getResultList().isEmpty()) {
+			monkey = (Monkey) queryMonkey.getResultList().get(0);
+		} else {
+			monkey = config.getMonkey("monkeys.properties");
+			monkey.setIsland(myLand);
+			manager.persist(monkey);
+		}
+		
+		Query queryPirate = manager.createQuery(
+	              "SELECT DISTINCT e FROM Element e, Island i Where i.id = e.islandPirate AND i.id =" + Integer.valueOf(name) + " AND TYPE(e) = Pirate");
+		
+		
+		if (!queryPirate.getResultList().isEmpty()) {
+			myPirate = (Pirate) queryPirate.getResultList().get(0);
+		} else {
+			myPirate = config.getPirate("monkeys.properties");
+			myPirate.setIsland(myLand);
+			manager.persist(myPirate);
 		}
 		
 		com.sendMap(myLand.getMap(), String.valueOf(myLand.getId()));
-//		com.sendMonkey(monkey, String.valueOf(monkey.getId()));
-//		com.sendPirate(myPirate, String.valueOf(myPirate.getId()));
+		com.sendMonkey(monkey, String.valueOf(monkey.getId()));
+		com.sendPirate(myPirate, String.valueOf(myPirate.getId()));
 		com.sendRum(rum, String.valueOf(rum.getId()));
 		com.sendTreasure(treasure, String.valueOf(treasure.getId()));
 	}

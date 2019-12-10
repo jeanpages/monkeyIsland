@@ -16,14 +16,14 @@ public class Pirate extends Element {
 
 	@ManyToOne
 	@JoinColumn(name="ISLAND_ID")
-	private Island island;
+	private Island islandPirate;
 
 	public Island getIsland() {
-		return this.island;
+		return this.islandPirate;
 	}
 	
-	public void setIsland(Island island) {
-		this.island = island;
+	public void setIsland(Island islandPirate) {
+		this.islandPirate = islandPirate;
 	}
 	
 	public Pirate() {}

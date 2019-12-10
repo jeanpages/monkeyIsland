@@ -11,14 +11,14 @@ public class Monkey extends Element {
 
 	@ManyToOne
 	@JoinColumn(name="ISLAND_ID")
-	private Island island;
+	private Island islandMonkey;
 
 	public Island getIsland() {
-		return this.island;
+		return this.islandMonkey;
 	}
 	
-	public void setIsland(Island island) {
-		this.island = island;
+	public void setIsland(Island islandMonkey) {
+		this.islandMonkey = islandMonkey;
 	}
 	
 	public Monkey() {}

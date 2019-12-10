@@ -1,6 +1,8 @@
 package monkeys.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -17,15 +19,15 @@ public class Rum extends Element {
 	private boolean visible;
 	private int energy;
 	
-	@OneToOne
-	private Island island;
+	@OneToOne(mappedBy="rum", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	private Island islandRum;
 
 	public Island getIsland() {
-		return this.island;
+		return this.islandRum;
 	}
 	
-	public void setIsland(Island island) {
-		this.island = island;
+	public void setIsland(Island islandRum) {
+		this.islandRum = islandRum;
 	}
 	
 	public Rum() {}
