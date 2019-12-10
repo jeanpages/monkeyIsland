@@ -7,17 +7,17 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Pirate")
+@Table(name="pirate")
 public class Pirate extends Element {
 	
 	private String avatar;
 	private State status;
 	private int energy;
-	
-	private Island island;
 
 	@ManyToOne
 	@JoinColumn(name="ISLAND_ID")
+	private Island island;
+
 	public Island getIsland() {
 		return this.island;
 	}

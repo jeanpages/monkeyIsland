@@ -11,23 +11,14 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name="Rum")
+@Table(name="rum")
 public class Rum extends Element {
 
 	private boolean visible;
 	private int energy;
 	
-	private Island island;
-
 	@OneToOne
-	@JoinColumn(name="ISLAND_ID")
-	public Island getIsland() {
-		return this.island;
-	}
-	
-	public void setIsland(Island island) {
-		this.island = island;
-	}
+	private Island island;
 	
 	public Rum() {}
 	

@@ -12,7 +12,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Element")
 public abstract class Element implements Serializable {
-	
+
+	@Id
+	@GeneratedValue
 	private int id;
 	private int posX;
 	private int posY;
@@ -22,8 +24,6 @@ public abstract class Element implements Serializable {
 	/**
 	 * @return the id
 	 */
-	@Id
-	@GeneratedValue
 	public int getId() {
 		return id;
 	}

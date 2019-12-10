@@ -1,7 +1,7 @@
 package monkeys.model;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,40 +16,48 @@ import javax.persistence.Table;
  * @author Mickael Clavreul
  */
 @Entity
-@Table(name = "Island")
+@Table(name="island")
 public class Island {
-	
+
+	@Id
+	@GeneratedValue
 	private int id;
+	
+	@Column(length = 100000)
 	private int[][] map;
 
 	public Island() {
 		this.map = null;
 	}
-	
-	private List<Monkey> monkeys = new ArrayList<>();
-	private List<Pirate> pirates = new ArrayList<>();
+
+	@OneToMany(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	private Collection<Monkey> monkeys = new ArrayList<>();
+
+	@OneToMany(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	private Collection<Pirate> pirates = new ArrayList<>();
+
+	@OneToOne(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	private Rum rum;
+
+	@OneToOne(mappedBy="island", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	private Treasure treasure;
 	
-	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	public List<Monkey> getMonkeys(){
+	public Collection<Monkey> getMonkeys(){
 		return monkeys;
 	}
 	
-	public void setMonkeys(List<Monkey> monkeys) {
+	public void setMonkeys(Collection<Monkey> monkeys) {
 		this.monkeys = monkeys;
 	}
 	
-	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	public List<Pirate> getPirates(){
+	public Collection<Pirate> getPirates(){
 		return pirates;
 	}
 	
-	public void setPirates(List<Pirate> pirates) {
+	public void setPirates(Collection<Pirate> pirates) {
 		this.pirates = pirates;
 	}
 	
-	@OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	public Rum getRum(){
 		return rum;
 	}
@@ -58,7 +66,6 @@ public class Island {
 		this.rum = rum;
 	}
 	
-	@OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	public Treasure getTreasure(){
 		return treasure;
 	}
@@ -70,8 +77,6 @@ public class Island {
 	/**
 	 * @return the id
 	 */
-	@Id
-	@GeneratedValue
 	public int getId() {
 		return id;
 	}
@@ -86,7 +91,6 @@ public class Island {
 	/**
 	 * @return the map
 	 */
-	@Column(length = 100000)
 	public int[][] getMap() {
 		return map;
 	}

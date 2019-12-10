@@ -6,13 +6,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Monkey")
+@Table(name="monkey")
 public class Monkey extends Element {
-	
-	private Island island;
 
 	@ManyToOne
 	@JoinColumn(name="ISLAND_ID")
+	private Island island;
+
 	public Island getIsland() {
 		return this.island;
 	}
