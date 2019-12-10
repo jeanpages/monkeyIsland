@@ -1,5 +1,6 @@
 package monkeys.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -17,10 +18,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="island")
-public class Island {
+public class Island implements Serializable {
 
 	@Id
-	@GeneratedValue
 	private int id;
 	
 	@Column(length = 100000)

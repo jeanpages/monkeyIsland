@@ -112,7 +112,7 @@ public class Monkeys implements MessageListener, GameObserver {
 		
 		TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 		
-		MessageConsumer messageConsumer = session.createSharedDurableConsumer(topic, String.valueOf(instance.hashCode()));
+		MessageConsumer messageConsumer = session.createSharedDurableConsumer(topic, String.valueOf(System.currentTimeMillis()/1000));
 		
 		messageConsumer.setMessageListener(instance);
 		

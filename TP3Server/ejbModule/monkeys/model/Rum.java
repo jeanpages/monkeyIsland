@@ -19,6 +19,14 @@ public class Rum extends Element {
 	
 	@OneToOne
 	private Island island;
+
+	public Island getIsland() {
+		return this.island;
+	}
+	
+	public void setIsland(Island island) {
+		this.island = island;
+	}
 	
 	public Rum() {}
 	

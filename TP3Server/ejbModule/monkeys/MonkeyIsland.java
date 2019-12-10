@@ -57,23 +57,34 @@ public class MonkeyIsland implements MIRemote {
 	private void newGame(String name) throws IOException {
 		if (manager.find(Island.class, Integer.valueOf(name)) != null) {
 			myLand = manager.find(Island.class, Integer.valueOf(name));
+			
+			
 		} else {
 			myLand = config.getMap("monkeys.properties");
-			rum = config.getRum("monkeys.properties");
-			monkey = config.getMonkey("monkeys.properties");
-			myPirate = config.getPirate("monkeys.properties");
-			treasure = config.getTreasure("monkeys.properties");
+			myLand.setId(Integer.valueOf(name));
+			
+//			monkey = config.getMonkey("monkeys.properties");
+//			myPirate = config.getPirate("monkeys.properties");
+//			treasure = config.getTreasure("monkeys.properties");
 			manager.persist(myLand);
+			
+//			manager.persist(myPirate);
+//			manager.persist(treasure);
+//			manager.persist(monkey);
+		}
+		
+		if ((Rum) manager.createQuery("FROM Element WHERE ISLAND_ID = " + name).getSingleResult() != null) {
+			rum = (Rum) manager.createQuery("FROM Element WHERE ISLAND_ID = " + name).getSingleResult();
+		} else {
+			rum = config.getRum("monkeys.properties");
+			rum.setIsland(myLand);
 			manager.persist(rum);
-			manager.persist(myPirate);
-			manager.persist(treasure);
-			manager.persist(monkey);
 		}
 
 		com.sendMap(myLand.getMap(), String.valueOf(myLand.getId()));
-		com.sendMonkey(monkey, String.valueOf(monkey.getId()));
-		com.sendPirate(myPirate, String.valueOf(myPirate.getId()));
+//		com.sendMonkey(monkey, String.valueOf(monkey.getId()));
+//		com.sendPirate(myPirate, String.valueOf(myPirate.getId()));
 		com.sendRum(rum, String.valueOf(rum.getId()));
-		com.sendTreasure(treasure, String.valueOf(treasure.getId()));
+//		com.sendTreasure(treasure, String.valueOf(treasure.getId()));
 	}
 }
