@@ -2,6 +2,7 @@ package monkeys;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -30,6 +31,7 @@ import monkeys.MIRemote;
 import monkeys.model.Monkey;
 import monkeys.model.Pirate;
 import monkeys.model.Rum;
+import monkeys.model.State;
 import monkeys.model.Treasure;
 
 /**
@@ -44,18 +46,25 @@ public class Monkeys implements MessageListener, GameObserver {
 	
 	private static TopicConnection connection;
 	
+	private static MIRemote miremote;
+	
+	private static int id;
+	
+	private Boolean initEnergy = false;
+	
 	public static void main(String[] args) throws Exception {
 		 
 		fenetre = new Fenetre("MonkeysIsland");
 
 		instance = new Monkeys();
-		System.out.println(instance.hashCode());
+		
+		id = (int) System.currentTimeMillis();
 		
 		connection = subscribeTopic();
 		
-		MIRemote miremote = lookup("ejb:/TP3Server/MonkeyIsland!monkeys.MIRemote?stateful");
+		miremote = lookup("ejb:/TP3Server/MonkeyIsland!monkeys.MIRemote?singleton");
 		
-		miremote.subscribe(String.valueOf(instance.hashCode()));
+		miremote.subscribe(id);
 		
 		fenetre.addObserver(instance);
 		
@@ -112,7 +121,7 @@ public class Monkeys implements MessageListener, GameObserver {
 		
 		TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 		
-		MessageConsumer messageConsumer = session.createSharedDurableConsumer(topic, String.valueOf(System.currentTimeMillis()/1000));
+		MessageConsumer messageConsumer = session.createSharedDurableConsumer(topic, String.valueOf(System.currentTimeMillis()));
 		
 		messageConsumer.setMessageListener(instance);
 		
@@ -121,6 +130,7 @@ public class Monkeys implements MessageListener, GameObserver {
 		return connection;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onMessage(Message arg0) {
 		try {
@@ -137,12 +147,40 @@ public class Monkeys implements MessageListener, GameObserver {
 							matrix[i][j] = streamMessage.readInt();
 						}
 					}
-					createMap();
+					fenetre.creationCarte(matrix);
+					fenetre.repaint();
 					break;
-				case "pirate":
+				case "removePirates":
 					objectMessage = (ObjectMessage) arg0;
-					Pirate pirate = (Pirate) objectMessage.getObject();
-					fenetre.ajoutPirate(pirate.getId(), pirate.getPosX(), pirate.getPosY(), pirate.getAvatar(), pirate.getEnergy());
+					List<Integer> piratesId = (List<Integer>) objectMessage.getObject();
+					fenetre.suppressionPirates(piratesId);
+					for (int i : piratesId) {
+						fenetre.suppressionPirate(i);
+					}
+					fenetre.repaint();
+					break;
+				case "addPirate":
+					objectMessage = (ObjectMessage) arg0;
+					Pirate aPirate = (Pirate) objectMessage.getObject();
+					fenetre.ajoutPirate(aPirate.getClientId(), aPirate.getPosX(), aPirate.getPosY(), selectAvatar(aPirate), aPirate.getEnergy());
+					if (!initEnergy){
+						fenetre.getEnergyView().setEnergieMax(aPirate.getEnergy());
+						fenetre.updateEnergieView(aPirate.getEnergy());
+						initEnergy = true;
+					}
+					fenetre.repaint();
+					break;
+				case "movePirate":
+					objectMessage = (ObjectMessage) arg0;
+					Pirate mPirate = (Pirate) objectMessage.getObject();
+					fenetre.suppressionPirate(mPirate.getClientId());
+					fenetre.ajoutPirate(mPirate.getClientId(), mPirate.getPosX(), mPirate.getPosY(), selectAvatar(mPirate), mPirate.getEnergy());
+					if (mPirate.getClientId() == id){
+						fenetre.getEnergyView().miseAJourEnergie(-1);
+					}
+					if (mPirate.getStatus() == State.DEAD) {
+						fenetre.mortPirate(mPirate.getClientId());
+					}
 					fenetre.repaint();
 					break;
 				case "rum":
@@ -163,6 +201,11 @@ public class Monkeys implements MessageListener, GameObserver {
 					fenetre.creationEMonkey(monkey.getId(), monkey.getPosX(), monkey.getPosY());
 					fenetre.repaint();
 					break;
+				case "disconnect":
+					streamMessage = (StreamMessage) arg0;
+					fenetre.suppressionPirate(streamMessage.readInt());
+					fenetre.repaint();
+					break;
 				default:
 					break;
 			}
@@ -174,6 +217,7 @@ public class Monkeys implements MessageListener, GameObserver {
 	@Override
 	public void notifyDisconnect() {
 		try {
+			miremote.disconnect(id);
 			connection.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
@@ -183,13 +227,19 @@ public class Monkeys implements MessageListener, GameObserver {
 
 	@Override
 	public void notifyMove(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
+		try {
+			miremote.movePirate(id, arg0, arg1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	private void createMap() {
-		fenetre.creationCarte(matrix);
-		fenetre.repaint();
+	private String selectAvatar(Pirate pirate) {
+		if (pirate.getClientId() == id) {
+			return "img/Mon_Pirate.png";
+		} else {
+			return "img/Autres_Pirates.jpg";
+		}
 	}
 
 }

@@ -8,9 +8,9 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/TP3Server"/>
-	<classpathentry kind="lib" path="Librairies/jboss-client.jar"/>
-	<classpathentry kind="lib" path="Librairies/gbui.jar"/>
+	<classpathentry kind="lib" path="/Users/jeanpages/Documents/ESEO/I3/S9/Composants_Logiciels/repository/monkeyIsland/TP3Client/lib/jboss-client.jar"/>
+	<classpathentry kind="lib" path="/Users/jeanpages/Documents/ESEO/I3/S9/Composants_Logiciels/repository/monkeyIsland/TP3Client/lib/gbui.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 8.x Runtime"/>
-	<classpathentry kind="lib" path="Librairies/hibernate-core-4.3.7.Final.jar"/>
+	<classpathentry kind="lib" path="/Users/jeanpages/Documents/ESEO/I3/S9/Composants_Logiciels/repository/monkeyIsland/TP3Client/lib/hibernate-core-4.3.7.Final.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

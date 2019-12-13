@@ -1,11 +1,8 @@
 package monkeys.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -13,13 +10,13 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name="rum")
 public class Rum extends Element {
 
 	private boolean visible;
 	private int energy;
 	
-	@OneToOne(mappedBy="rum", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@ManyToOne
+	@JoinColumn(name="ISLAND_ID")
 	private Island islandRum;
 
 	public Island getIsland() {

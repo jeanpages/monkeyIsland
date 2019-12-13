@@ -2,7 +2,7 @@ package monkeys.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,57 +13,73 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 /**
  * @author Mickael Clavreul
  */
 @Entity
 @Table(name="island")
 public class Island implements Serializable {
+	
+	@Transient
+	private static Island instance = null;
 
 	@Id
+	@GeneratedValue
 	private int id;
 	
 	@Column(length = 100000)
 	private int[][] map;
 
-	public Island() {
+	private Island() {
 		this.map = null;
+	}
+	
+	public static synchronized Island getInstance() {
+		if (instance == null) {
+			synchronized (Island.class) {
+				if (instance == null) {
+					instance = new Island();
+				}
+			}
+		}
+		return instance;
 	}
 
 	@OneToMany(mappedBy="islandMonkey", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	private Collection<Monkey> monkeys = new ArrayList<>();
+	private List<Monkey> monkeys = new ArrayList<>();
 
 	@OneToMany(mappedBy="islandPirate", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	private Collection<Pirate> pirates = new ArrayList<>();
+	private List<Pirate> pirates = new ArrayList<>();
 
-	@OneToOne
-	private Rum rum;
+	@OneToMany(mappedBy="islandRum", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	private List<Rum> rums = new ArrayList<>();
 
 	@OneToOne
 	private Treasure treasure;
 	
-	public Collection<Monkey> getMonkeys(){
+	public List<Monkey> getMonkeys(){
 		return monkeys;
 	}
 	
-	public void setMonkeys(Collection<Monkey> monkeys) {
+	public void setMonkeys(List<Monkey> monkeys) {
 		this.monkeys = monkeys;
 	}
 	
-	public Collection<Pirate> getPirates(){
+	public List<Pirate> getPirates(){
 		return pirates;
 	}
 	
-	public void setPirates(Collection<Pirate> pirates) {
+	public void setPirates(List<Pirate> pirates) {
 		this.pirates = pirates;
 	}
 	
-	public Rum getRum(){
-		return rum;
+	public List<Rum> getRums(){
+		return rums;
 	}
 	
-	public void setRum(Rum rum) {
-		this.rum = rum;
+	public void setRum(List<Rum> rums) {
+		this.rums = rums;
 	}
 	
 	public Treasure getTreasure(){

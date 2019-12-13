@@ -10,6 +10,7 @@ import javax.ejb.Remote;
 @Remote
 public interface MIRemote {
 	
-	public void subscribe(String id) throws IOException;
-	public void disconnect(String pId);
+	public void subscribe(int id) throws IOException;
+	public void disconnect(int pId);
+	public void movePirate(int id, int posX, int posY) throws IOException;
 }

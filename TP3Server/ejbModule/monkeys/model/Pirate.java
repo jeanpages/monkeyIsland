@@ -1,16 +1,13 @@
 package monkeys.model;
 
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 @Entity
-@Table(name="pirate")
 public class Pirate extends Element {
 	
-	private String avatar;
+	private int clientId;
 	private State status;
 	private int energy;
 
@@ -27,13 +24,13 @@ public class Pirate extends Element {
 	}
 	
 	public Pirate() {}
-
-	public String getAvatar() {
-		return avatar;
+	
+	public int getClientId() {
+		return clientId;
 	}
 
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
+	public void setClientId(int clientId) {
+		this.clientId = clientId;
 	}
 
 	public State getStatus() {
@@ -54,7 +51,7 @@ public class Pirate extends Element {
 
 	@Override
 	public String toString() {
-		return "Pirate [getAvatar()=" + getAvatar() + ", getStatus()=" + getStatus() + ", getEnergy()=" + getEnergy()
+		return "Pirate [id=" + getClientId() + "getStatus()=" + getStatus() + ", getEnergy()=" + getEnergy()
 				+ ", getId()=" + getId() + ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
 	}
 	

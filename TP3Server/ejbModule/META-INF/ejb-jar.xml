@@ -9,7 +9,7 @@
 			<ejb-name>MonkeyIsland</ejb-name>
 			<ejb-local-ref>
 				<ejb-ref-name>monkeys.MonkeyIsland/config</ejb-ref-name>
-				<local>monkeys.Configuration</local>
+				<local>monkeys.configuration.Configuration</local>
 				<ejb-link>Configuration</ejb-link>
 			</ejb-local-ref>
 		</session>

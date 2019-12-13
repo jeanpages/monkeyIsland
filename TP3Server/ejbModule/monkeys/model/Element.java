@@ -6,10 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.DiscriminatorOptions;
 /**
  * @author Mickael Clavreul
  */
 @Entity
+@DiscriminatorOptions(force=true)
 @Table(name = "Element")
 public abstract class Element implements Serializable {
 
