@@ -20,6 +20,7 @@ import monkeys.model.Monkey;
 import monkeys.model.Pirate;
 import monkeys.model.Rum;
 import monkeys.model.State;
+import monkeys.model.Treasure;
 
 /**
  * Session Bean implementation class MonkeyIsland
@@ -32,6 +33,7 @@ public class MonkeyIsland implements MIRemote {
 	private EntityManager manager;
 	private Island myLand = Island.getInstance();
 	private Pirate myPirate;
+	private Treasure treasure;
 	
 	@EJB
 	private Configuration config;
@@ -94,6 +96,14 @@ public class MonkeyIsland implements MIRemote {
 				pirate.setEnergy(0);
 				manager.merge(pirate);
 				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
+			} else if (isTreasure(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
+				pirate.setPosX(pirate.getPosX() + posX);
+				pirate.setPosY(pirate.getPosY() + posY);
+				treasure.setVisible(true);
+				manager.merge(treasure);
+				com.sendTreasure(treasure, String.valueOf(treasure.getId()));
+				manager.merge(pirate);
+				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
 			}
 			
 		}
@@ -121,6 +131,16 @@ public class MonkeyIsland implements MIRemote {
 			myPirate.setIsland(myLand);
 			manager.persist(myPirate);
 			myLand.getPirates().add(myPirate);
+		}
+		
+		if(myLand.getTreasure() == null) {
+			treasure = config.getTreasure();
+			randomInit(treasure);
+			treasure.setIsland(myLand);
+			manager.persist(treasure);
+			myLand.setTreasure(treasure);
+		} else {
+			treasure = manager.find(Treasure.class, myLand.getTreasure().getId());
 		}
 		
 		initClient(id);
@@ -174,7 +194,8 @@ public class MonkeyIsland implements MIRemote {
 	 * @return
 	 */
 	private boolean isEmpty(int newPosX, int newPosY) {
-		return !(isPirate(newPosX, newPosY) || isRum(newPosX, newPosY) || isMonkey(newPosX, newPosY));
+		return !(isPirate(newPosX, newPosY) || isRum(newPosX, newPosY) || 
+				isMonkey(newPosX, newPosY) || isTreasure(newPosX, newPosY));
 	}
 	
 	/**
@@ -226,5 +247,21 @@ public class MonkeyIsland implements MIRemote {
 			}
 		}
 		return isMonkey;
+	}
+	
+	/**
+	 * Vérifie s'il y a un tresor sur la case.
+	 * @param newPosX
+	 * @param newPosY
+	 * @return
+	 */
+	private boolean isTreasure(int newPosX, int newPosY) {
+		boolean isTreasure = false;
+		if (myLand.getTreasure()!=null) {
+			if (myLand.getTreasure().getPosX() == newPosX && myLand.getTreasure().getPosY() == newPosY) {
+				isTreasure = true;
+			}
+		}
+		return isTreasure;
 	}
 }

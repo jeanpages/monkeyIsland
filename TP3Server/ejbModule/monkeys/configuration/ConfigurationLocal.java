@@ -18,6 +18,6 @@ public interface ConfigurationLocal {
 	public Pirate getPirate(String file) throws IOException;
 	public Monkey getMonkey(String file) throws IOException;
 	public Rum getRum(String file) throws IOException;
-	public Treasure getTreasure(String file) throws IOException;
+	public Treasure getTreasure();
 	
 }

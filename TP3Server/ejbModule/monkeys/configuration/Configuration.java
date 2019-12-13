@@ -98,16 +98,8 @@ public class Configuration implements ConfigurationLocal {
 	}
 
 	@Override
-	public Treasure getTreasure(String file) throws IOException {
-		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
-		Properties properties = new Properties ();
-		properties.load(is);
-		
-		String posXProperty = (String) properties.getProperty("TRESOR_POS_X");
-		String posYProperty = (String) properties.getProperty("TRESOR_POS_Y");
+	public Treasure getTreasure() {
 		Treasure treasure = new Treasure();
-		treasure.setPosX(Integer.parseInt(posXProperty));
-		treasure.setPosY(Integer.parseInt(posYProperty));
 		treasure.setVisible(false);
 		return treasure;
 	}
