@@ -1,6 +1,5 @@
 package monkeys.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
@@ -15,7 +14,7 @@ public class Treasure extends Element{
 	
 	private boolean visible;
 	
-	@OneToOne(mappedBy="treasure", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToOne(mappedBy="treasure", fetch=FetchType.EAGER, orphanRemoval = true)
 	private Island islandTreasure;
 	
 	public Treasure() {}

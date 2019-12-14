@@ -8,7 +8,6 @@ import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 
 import monkeys.model.Island;
-import monkeys.model.Monkey;
 import monkeys.model.Pirate;
 import monkeys.model.Rum;
 import monkeys.model.State;
@@ -67,17 +66,12 @@ public class Configuration implements ConfigurationLocal {
 	}
 
 	@Override
-	public Monkey getMonkey(String file) throws IOException {
+	public int getMonkeyNumber(String file) throws IOException {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
 		Properties properties = new Properties ();
 		properties.load(is);
-		
-		String posXProperty = (String) properties.getProperty("SINGE_POS_X");
-		String posYProperty = (String) properties.getProperty("SINGE_POS_Y");
-		Monkey monkey = new Monkey();
-		monkey.setPosX(Integer.parseInt(posXProperty));
-		monkey.setPosY(Integer.parseInt(posYProperty));
-		return monkey;
+
+		return Integer.parseInt(properties.getProperty("MONKEY_NUMBER"));
 	}
 
 	@Override

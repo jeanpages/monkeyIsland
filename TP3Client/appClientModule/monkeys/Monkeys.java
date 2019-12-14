@@ -31,7 +31,6 @@ import monkeys.MIRemote;
 import monkeys.model.Monkey;
 import monkeys.model.Pirate;
 import monkeys.model.Rum;
-import monkeys.model.State;
 import monkeys.model.Treasure;
 
 /**
@@ -50,8 +49,6 @@ public class Monkeys implements MessageListener, GameObserver {
 	
 	private static int id;
 	
-	private Boolean initEnergy = false;
-	
 	public static void main(String[] args) throws Exception {
 		 
 		fenetre = new Fenetre("MonkeysIsland");
@@ -62,7 +59,7 @@ public class Monkeys implements MessageListener, GameObserver {
 		
 		connection = subscribeTopic();
 		
-		miremote = lookup("ejb:/TP3Server/MonkeyIsland!monkeys.MIRemote?singleton");
+		miremote = lookup("ejb:/TP3Server/MonkeyIsland!monkeys.MIRemote?stateful");
 		
 		miremote.subscribe(id);
 		
@@ -159,28 +156,39 @@ public class Monkeys implements MessageListener, GameObserver {
 					}
 					fenetre.repaint();
 					break;
+				case "removeMonkeys":
+					fenetre.removeEMonkeys();
+					fenetre.repaint();
+					break;
 				case "addPirate":
 					objectMessage = (ObjectMessage) arg0;
 					Pirate aPirate = (Pirate) objectMessage.getObject();
 					fenetre.ajoutPirate(aPirate.getClientId(), aPirate.getPosX(), aPirate.getPosY(), selectAvatar(aPirate), aPirate.getEnergy());
-					if (!initEnergy){
-						fenetre.getEnergyView().setEnergieMax(aPirate.getEnergy());
-						fenetre.updateEnergieView(aPirate.getEnergy());
-						initEnergy = true;
-					}
 					fenetre.repaint();
+					break;
+				case "initEnergy":
+					objectMessage = (ObjectMessage) arg0;
+					Pirate iPirate = (Pirate) objectMessage.getObject();
+					if (iPirate.getClientId() == id) {
+						fenetre.getEnergyView().setEnergieMax(iPirate.getEnergy());
+						fenetre.updateEnergieView(iPirate.getEnergy());
+						fenetre.repaint();
+					}
 					break;
 				case "movePirate":
 					objectMessage = (ObjectMessage) arg0;
 					Pirate mPirate = (Pirate) objectMessage.getObject();
 					fenetre.suppressionPirate(mPirate.getClientId());
 					fenetre.ajoutPirate(mPirate.getClientId(), mPirate.getPosX(), mPirate.getPosY(), selectAvatar(mPirate), mPirate.getEnergy());
-					if (mPirate.getClientId() == id){
+					if (mPirate.getClientId() == id) {
 						fenetre.getEnergyView().miseAJourEnergie(-1);
 					}
-					if (mPirate.getStatus() == State.DEAD) {
-						fenetre.mortPirate(mPirate.getClientId());
-					}
+					
+					break;
+				case "pirateDeath":
+					objectMessage = (ObjectMessage) arg0;
+					Pirate dPirate = (Pirate) objectMessage.getObject();
+					fenetre.mortPirate(dPirate.getClientId());
 					fenetre.repaint();
 					break;
 				case "rum":

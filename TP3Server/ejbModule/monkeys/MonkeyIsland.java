@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import javax.ejb.EJB;
-import javax.ejb.Singleton;
+import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
@@ -21,12 +21,13 @@ import monkeys.model.Pirate;
 import monkeys.model.Rum;
 import monkeys.model.State;
 import monkeys.model.Treasure;
+import monkeys.timers.MoveMonkeyTimer;
 
 /**
  * Session Bean implementation class MonkeyIsland
  * @author Mickael Clavreul
  */
-@Singleton
+@Stateful
 public class MonkeyIsland implements MIRemote {
 
 	@PersistenceContext(unitName="MonkeysDS")
@@ -41,6 +42,9 @@ public class MonkeyIsland implements MIRemote {
 	@EJB
 	private Communication com;
 	
+	@EJB
+	private MoveMonkeyTimer timer;
+	
     public MonkeyIsland() {
     	
     }
@@ -52,12 +56,15 @@ public class MonkeyIsland implements MIRemote {
 	
 	@Override
 	public void disconnect(int id) {
+		Pirate pirate = null;
 		for (Pirate p : myLand.getPirates()) {
 			if (p.getClientId() == id) {
-				myLand.getPirates().remove(p);
-				manager.remove(p);
+				pirate = p;
 			}
 		}
+		myLand.getPirates().remove(pirate);
+		manager.remove(manager.find(Pirate.class, pirate.getId()));
+		
 		com.disconnect(id);
 	}
 	
@@ -82,6 +89,10 @@ public class MonkeyIsland implements MIRemote {
 				manager.merge(pirate);
 				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
 				
+				if (pirate.getEnergy() == 0) {
+					com.pirateDeath(pirate, String.valueOf(id));
+				}
+				
 			} else if (isRum(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
 				pirate.setPosX(pirate.getPosX() + posX);
 				pirate.setPosY(pirate.getPosY() + posY);
@@ -96,12 +107,14 @@ public class MonkeyIsland implements MIRemote {
 				pirate.setEnergy(0);
 				manager.merge(pirate);
 				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
+				com.pirateDeath(pirate, String.valueOf(id));
+				
 			} else if (isTreasure(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
 				pirate.setPosX(pirate.getPosX() + posX);
 				pirate.setPosY(pirate.getPosY() + posY);
-				treasure.setVisible(true);
-				manager.merge(treasure);
-				com.sendTreasure(treasure, String.valueOf(treasure.getId()));
+				myLand.getTreasure().setVisible(true);
+				manager.merge(myLand.getTreasure());
+				com.sendTreasure(myLand.getTreasure(), String.valueOf(myLand.getTreasure().getId()));
 				manager.merge(pirate);
 				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
 			}
@@ -116,15 +129,19 @@ public class MonkeyIsland implements MIRemote {
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void newGame(int id) throws IOException {
-		
-		if (manager.find(Island.class, myLand.getId()) == null) {
+		/*if (manager.find(Island.class, myLand.getId()) != null) {
+			myLand.setMonkeys(manager.find(Island.class, myLand.getId()).getMonkeys());
+			myLand.setPirates(manager.find(Island.class, myLand.getId()).getPirates());
+			myLand.setRums(manager.find(Island.class, myLand.getId()).getRums());
+			myLand.setTreasure(manager.find(Island.class, myLand.getId()).getTreasure());
+		}*/ if (manager.find(Island.class, myLand.getId()) == null) {
 			myLand = config.getMap("monkeys.properties");
-			manager.persist(myLand);			
-		} 
+			manager.persist(myLand);		
+		}
 		
-		if (manager.find(Pirate.class, id) != null) {
+		/*if (manager.find(Pirate.class, id) != null) {
 			myPirate = manager.find(Pirate.class, id);
-		} else {
+		}*/ if (manager.find(Pirate.class, id) == null) {
 			myPirate = config.getPirate("monkeys.properties");
 			myPirate.setClientId(id);
 			randomInit(myPirate);
@@ -133,14 +150,24 @@ public class MonkeyIsland implements MIRemote {
 			myLand.getPirates().add(myPirate);
 		}
 		
-		if(myLand.getTreasure() == null) {
+		/*if(myLand.getTreasure() != null) {
+			treasure = manager.find(Treasure.class, myLand.getTreasure().getId());
+		}*/ if(myLand.getTreasure() == null) {
 			treasure = config.getTreasure();
 			randomInit(treasure);
 			treasure.setIsland(myLand);
 			manager.persist(treasure);
 			myLand.setTreasure(treasure);
-		} else {
-			treasure = manager.find(Treasure.class, myLand.getTreasure().getId());
+		}
+		
+		if (myLand.getMonkeys().isEmpty()) {
+			for (int i = 0; i < config.getMonkeyNumber("monkeys.properties"); i++) {
+				Monkey monkey = new Monkey();
+				randomInit(monkey);
+				monkey.setIsland(myLand);
+				manager.persist(monkey);
+				myLand.getMonkeys().add(monkey);				
+			}
 		}
 		
 		initClient(id);
@@ -153,6 +180,7 @@ public class MonkeyIsland implements MIRemote {
 	 * @return
 	 */
 	private void initClient(int id) {
+		
 		com.sendMap(myLand.getMap(), String.valueOf(myLand.getId()));
 		
 		List<Integer> iPirates = new ArrayList<>();
@@ -161,10 +189,17 @@ public class MonkeyIsland implements MIRemote {
 		}
 		
 		com.removePirates(iPirates);
+		com.removeMonkeys();
 		
 		for (Pirate p : myLand.getPirates()) {
 			com.sendPirate(p, String.valueOf(p.getClientId()));
 		}
+		
+		for (Monkey m : myLand.getMonkeys()) {
+			com.sendMonkey(m, String.valueOf(m.getId()));
+		}
+		
+		com.initEnergy(myPirate, String.valueOf(myPirate.getClientId()));
 	}
 	
 	/**
@@ -257,7 +292,7 @@ public class MonkeyIsland implements MIRemote {
 	 */
 	private boolean isTreasure(int newPosX, int newPosY) {
 		boolean isTreasure = false;
-		if (myLand.getTreasure()!=null) {
+		if (myLand.getTreasure() != null) {
 			if (myLand.getTreasure().getPosX() == newPosX && myLand.getTreasure().getPosY() == newPosY) {
 				isTreasure = true;
 			}

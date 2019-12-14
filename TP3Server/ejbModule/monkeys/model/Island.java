@@ -2,9 +2,9 @@ package monkeys.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -46,13 +46,13 @@ public class Island implements Serializable {
 		return instance;
 	}
 
-	@OneToMany(mappedBy="islandMonkey", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="islandMonkey", fetch=FetchType.EAGER, orphanRemoval = true)
 	private List<Monkey> monkeys = new ArrayList<>();
 
-	@OneToMany(mappedBy="islandPirate", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="islandPirate", fetch=FetchType.EAGER, orphanRemoval = true)
 	private List<Pirate> pirates = new ArrayList<>();
 
-	@OneToMany(mappedBy="islandRum", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="islandRum", fetch=FetchType.EAGER, orphanRemoval = true)
 	private List<Rum> rums = new ArrayList<>();
 
 	@OneToOne
@@ -78,7 +78,7 @@ public class Island implements Serializable {
 		return rums;
 	}
 	
-	public void setRum(List<Rum> rums) {
+	public void setRums(List<Rum> rums) {
 		this.rums = rums;
 	}
 	
@@ -117,8 +117,12 @@ public class Island implements Serializable {
 	public void setMap(int[][] map) {
 		this.map = map;
 	}
-	
+
+	@Override
 	public String toString() {
-		return "Island[id=" + this.getId() + "; map=" + this.getMap() + "]";
+		return "Island [id=" + id + ", map=" + Arrays.toString(map) + ", monkeys=" + monkeys + ", pirates=" + pirates
+				+ ", rums=" + rums + ", treasure=" + treasure + "]";
 	}
+	
+	
 }

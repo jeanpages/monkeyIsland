@@ -75,6 +75,21 @@ public class Communication implements CommunicationLocal {
 	}
 	
 	@Override
+	public void pirateDeath(Pirate pirate, String id) {
+		sendElementMessage(pirate, id, "pirateDeath");
+	}
+	
+	@Override
+	public void removeMonkeys() {
+		sendMessage("removeMonkeys");
+	}
+	
+	@Override
+	public void initEnergy(Pirate pirate, String id) {
+		sendElementMessage(pirate, id, "initEnergy");
+	}
+	
+	@Override
 	public void disconnect(int id) {
 		StreamMessage message = context.createStreamMessage();
 		try {	
@@ -121,6 +136,16 @@ public class Communication implements CommunicationLocal {
 		try {
     		message.setJMSType(type);
     		message.setObject((Serializable) piratesId);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+    	context.createProducer().send(topic, message);
+	}
+	
+	private void sendMessage(String type) {
+		StreamMessage message = context.createStreamMessage();
+		try {
+    		message.setJMSType(type);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
