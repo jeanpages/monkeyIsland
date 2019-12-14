@@ -160,6 +160,10 @@ public class Monkeys implements MessageListener, GameObserver {
 					fenetre.removeEMonkeys();
 					fenetre.repaint();
 					break;
+				case "removeRums":
+					fenetre.removeRhums();
+					fenetre.repaint();
+					break;
 				case "addPirate":
 					objectMessage = (ObjectMessage) arg0;
 					Pirate aPirate = (Pirate) objectMessage.getObject();
@@ -175,6 +179,13 @@ public class Monkeys implements MessageListener, GameObserver {
 						fenetre.repaint();
 					}
 					break;
+				case "energyIncrease":
+					objectMessage = (ObjectMessage) arg0;
+					Pirate ePirate = (Pirate) objectMessage.getObject();
+					if (ePirate.getClientId() == id) {
+						fenetre.getEnergyView().miseAJourEnergie(5);
+					}
+					break;
 				case "movePirate":
 					objectMessage = (ObjectMessage) arg0;
 					Pirate mPirate = (Pirate) objectMessage.getObject();
@@ -182,8 +193,7 @@ public class Monkeys implements MessageListener, GameObserver {
 					fenetre.ajoutPirate(mPirate.getClientId(), mPirate.getPosX(), mPirate.getPosY(), selectAvatar(mPirate), mPirate.getEnergy());
 					if (mPirate.getClientId() == id) {
 						fenetre.getEnergyView().miseAJourEnergie(-1);
-					}
-					
+					}					
 					break;
 				case "pirateDeath":
 					objectMessage = (ObjectMessage) arg0;

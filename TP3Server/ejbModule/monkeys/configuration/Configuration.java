@@ -73,6 +73,15 @@ public class Configuration implements ConfigurationLocal {
 
 		return Integer.parseInt(properties.getProperty("MONKEY_NUMBER"));
 	}
+	
+	@Override
+	public int getRumNumber(String file) throws IOException {
+		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+		Properties properties = new Properties ();
+		properties.load(is);
+
+		return Integer.parseInt(properties.getProperty("RUM_NUMBER"));
+	}
 
 	@Override
 	public Rum getRum(String file) throws IOException {
@@ -81,12 +90,8 @@ public class Configuration implements ConfigurationLocal {
 		properties.load(is);
 		
 		String energieProperty = (String) properties.getProperty("RUM_ENERGIE");
-		String posXProperty = (String) properties.getProperty("RUM_POS_X");
-		String posYProperty = (String) properties.getProperty("RUM_POS_Y");
 		Rum rum = new Rum();
 		rum.setEnergy(Integer.parseInt(energieProperty));
-		rum.setPosX(Integer.parseInt(posXProperty));
-		rum.setPosY(Integer.parseInt(posYProperty));
 		rum.setVisible(true);
 		return rum;
 	}

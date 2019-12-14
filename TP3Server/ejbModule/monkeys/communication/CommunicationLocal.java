@@ -18,8 +18,10 @@ public interface CommunicationLocal {
 	public void sendTreasure(Treasure treasure, String id);
 	public void movePirate(Pirate pirate, String id);
 	public void pirateDeath(Pirate pirate, String id);
+	public void energyIncrease(Pirate pirate, String id);
 	public void removePirates(List<Integer> pirates);
 	public void removeMonkeys();
+	public void removeRums();
 	public void disconnect(int id);
 	public void initEnergy(Pirate pirate, String id);
 }

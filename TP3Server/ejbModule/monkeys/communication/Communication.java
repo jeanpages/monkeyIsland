@@ -85,8 +85,18 @@ public class Communication implements CommunicationLocal {
 	}
 	
 	@Override
+	public void removeRums() {
+		sendMessage("removeRums");
+	}
+	
+	@Override
 	public void initEnergy(Pirate pirate, String id) {
 		sendElementMessage(pirate, id, "initEnergy");
+	}
+	
+	@Override
+	public void energyIncrease(Pirate pirate, String id) {
+		sendElementMessage(pirate, id, "energyIncrease");
 	}
 	
 	@Override

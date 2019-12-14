@@ -16,6 +16,7 @@ public interface ConfigurationLocal {
 	public Island getMap(String file) throws IOException;
 	public Pirate getPirate(String file) throws IOException;
 	public int getMonkeyNumber(String file) throws IOException;
+	public int getRumNumber(String file) throws IOException;
 	public Rum getRum(String file) throws IOException;
 	public Treasure getTreasure();
 	

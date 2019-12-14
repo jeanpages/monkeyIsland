@@ -22,6 +22,7 @@ import monkeys.model.Rum;
 import monkeys.model.State;
 import monkeys.model.Treasure;
 import monkeys.timers.MoveMonkeyTimer;
+import monkeys.timers.UpdateBottleTimer;
 
 /**
  * Session Bean implementation class MonkeyIsland
@@ -44,6 +45,9 @@ public class MonkeyIsland implements MIRemote {
 	
 	@EJB
 	private MoveMonkeyTimer timer;
+	
+	@EJB
+	private UpdateBottleTimer updateBottleTimer;
 	
     public MonkeyIsland() {
     	
@@ -94,11 +98,24 @@ public class MonkeyIsland implements MIRemote {
 				}
 				
 			} else if (isRum(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
+				Rum rum = findRumSameCellAsPirate(pirate.getPosX() + posX, pirate.getPosY() + posY);
 				pirate.setPosX(pirate.getPosX() + posX);
 				pirate.setPosY(pirate.getPosY() + posY);
-				pirate.setEnergy(pirate.getEnergy() + config.getRum("monkeys.properties").getEnergy());
-				manager.merge(pirate);
-				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
+				if (rum.isVisible()) {
+					pirate.setEnergy(pirate.getEnergy() + config.getRum("monkeys.properties").getEnergy());
+					myLand.getRums().get(this.findRumPosition(rum)).setVisible(false);
+					manager.merge(myLand.getRums().get(this.findRumPosition(rum)));
+					com.removeRums();
+					com.sendRum(myLand.getRums().get(this.findRumPosition(rum)), 
+							String.valueOf(rum.getId()));
+					manager.merge(pirate);
+					com.energyIncrease(pirate, String.valueOf(pirate.getClientId()));
+					com.movePirate(pirate, String.valueOf(pirate.getClientId()));
+				}
+				else {
+					manager.merge(pirate);
+					com.movePirate(pirate, String.valueOf(pirate.getClientId()));
+				}
 				
 			} else if (isMonkey(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
 				pirate.setPosX(pirate.getPosX() + posX);
@@ -170,6 +187,16 @@ public class MonkeyIsland implements MIRemote {
 			}
 		}
 		
+		if (myLand.getRums().isEmpty()) {
+			for (int i = 0 ; i < config.getRumNumber("monkeys.properties"); i++) {
+				Rum rum = config.getRum("monkeys.properties");
+				randomInit(rum);
+				rum.setIsland(myLand);
+				manager.persist(rum);
+				myLand.getRums().add(rum);
+			}
+		}
+		
 		initClient(id);
 	}
 	
@@ -190,6 +217,7 @@ public class MonkeyIsland implements MIRemote {
 		
 		com.removePirates(iPirates);
 		com.removeMonkeys();
+		com.removeRums();
 		
 		for (Pirate p : myLand.getPirates()) {
 			com.sendPirate(p, String.valueOf(p.getClientId()));
@@ -197,6 +225,10 @@ public class MonkeyIsland implements MIRemote {
 		
 		for (Monkey m : myLand.getMonkeys()) {
 			com.sendMonkey(m, String.valueOf(m.getId()));
+		}
+		
+		for (Rum r : myLand.getRums()) {
+			com.sendRum(r, String.valueOf(r.getId()));
 		}
 		
 		com.initEnergy(myPirate, String.valueOf(myPirate.getClientId()));
@@ -298,5 +330,34 @@ public class MonkeyIsland implements MIRemote {
 			}
 		}
 		return isTreasure;
+	}
+	
+	/**
+	 * Cherche la bouteille de rhum sur la même case que le pirate
+	 * @param newPosX
+	 * @param newPosY
+	 */
+	private Rum findRumSameCellAsPirate(int newPosX, int newPosY) {
+		Rum rum = null;
+		for (Rum r : myLand.getRums()) {
+			if (r.getPosX() == newPosX && r.getPosY() == newPosY) {
+				rum = r;
+			}
+		}
+		return rum;
+	}
+	
+	/**
+	 * Cherche la position du rum dans la liste
+	 * @param rum
+	 */
+	private int findRumPosition(Rum rum) {
+		int pos = 10000;
+		for (int i = 0 ; i < myLand.getRums().size(); i++) {
+			if (rum.equals(myLand.getRums().get(i))) {
+				pos = i;
+			}
+		}
+		return pos;
 	}
 }
