@@ -12,6 +12,7 @@ import monkeys.model.Treasure;
 @Local
 public interface CommunicationLocal {
 	public void sendMap(int[][] map, String id);
+	public void resetMap(int[][] map, String id);
 	public void sendPirate(Pirate pirate, String id);
 	public void sendMonkey(Monkey monkey, String id);
 	public void sendRum(Rum rum, String id);

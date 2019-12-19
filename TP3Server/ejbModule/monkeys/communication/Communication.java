@@ -45,6 +45,11 @@ public class Communication implements CommunicationLocal {
 	}
 	
 	@Override
+	public void resetMap(int[][] map, String id) {
+		sendIntArrayMessage(map, id, "resetMap");
+	}
+	
+	@Override
 	public void sendPirate(Pirate pirate, String id) {
 		sendElementMessage(pirate, id, "addPirate");
 	}

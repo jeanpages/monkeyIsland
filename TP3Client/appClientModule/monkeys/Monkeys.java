@@ -147,6 +147,18 @@ public class Monkeys implements MessageListener, GameObserver {
 					fenetre.creationCarte(matrix);
 					fenetre.repaint();
 					break;
+				case "resetMap":
+					streamMessage = (StreamMessage) arg0;
+					int arrayL = streamMessage.readInt();
+					matrix = new int[arrayL][arrayL];
+					for (int i = 0; i < arrayL; i++) {
+						for (int j = 0; j < arrayL; j++) {
+							matrix[i][j] = streamMessage.readInt();
+						}
+					}
+					fenetre.changementCarte(matrix);
+					fenetre.repaint();
+					break;
 				case "removePirates":
 					objectMessage = (ObjectMessage) arg0;
 					List<Integer> piratesId = (List<Integer>) objectMessage.getObject();
@@ -259,5 +271,4 @@ public class Monkeys implements MessageListener, GameObserver {
 			return "img/Autres_Pirates.jpg";
 		}
 	}
-
 }

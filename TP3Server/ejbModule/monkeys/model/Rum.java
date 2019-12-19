@@ -26,30 +26,18 @@ public class Rum extends Element {
 	public void setIsland(Island islandRum) {
 		this.islandRum = islandRum;
 	}
-	
-	public Rum() {}
-	
-	/**
-	 * 
-	 * @return hidden
-	 */
+
 	public boolean isVisible() {
 		return visible;
 	}
 	
-	
 	public void setVisible(boolean visible) {
 		this.visible = visible;
 	}
-	
-	/**
-	 * 
-	 * @return energy
-	 */
+
 	public int getEnergy() {
 		return energy;
 	}
-	
 	
 	public void setEnergy(int energy) {
 		this.energy = energy;
@@ -57,9 +45,8 @@ public class Rum extends Element {
 
 	@Override
 	public String toString() {
-		return "Rum [isHidden()=" + isVisible() + ", getEnergy()=" + getEnergy() + ", getId()=" + getId()
-				+ ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
+		return "Rum [visible=" + visible + ", energy=" + energy + ", " + super.toString() + "]";
 	}
-	
-	
+
+
 }

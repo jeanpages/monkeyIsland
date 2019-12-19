@@ -24,7 +24,7 @@ public class Configuration implements ConfigurationLocal {
      * Default constructor. 
      */
     public Configuration() {
-        // TODO Auto-generated constructor stub
+
     }
     
     @Override
@@ -63,6 +63,16 @@ public class Configuration implements ConfigurationLocal {
 		pirate.setEnergy(Integer.parseInt(maxEnergieProperty));
 		pirate.setStatus(State.SOBER);
 		return pirate;
+	}
+	
+	@Override
+	public int getPirateMaxEnergy(String file) throws IOException {
+		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
+		Properties properties = new Properties ();
+		properties.load(is);
+		
+		int maxEnergieProperty = Integer.parseInt(properties.getProperty("PIRATE_MAX_ENERGIE"));
+		return maxEnergieProperty;
 	}
 
 	@Override

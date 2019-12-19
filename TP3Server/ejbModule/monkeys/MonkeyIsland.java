@@ -53,11 +53,17 @@ public class MonkeyIsland implements MIRemote {
     	
     }
 
+    /**
+     * Connexion du pirate.
+     */
 	@Override
 	public void subscribe(int id) throws IOException {
 		newGame(id);
 	}
 	
+	/**
+	 * Déconnexion du pirate.
+	 */
 	@Override
 	public void disconnect(int id) {
 		Pirate pirate = null;
@@ -72,104 +78,132 @@ public class MonkeyIsland implements MIRemote {
 		com.disconnect(id);
 	}
 	
+	/**
+	 * Gère le déplacement d'un pirate.
+	 */
 	@Override
 	public void movePirate(int id, int posX, int posY) throws IOException {
 		Pirate pirate = null;
+		
+		// Recherche du pirate qui doit bouger
 		for (int i = 0; i < myLand.getPirates().size(); i++) {
 			if (myLand.getPirates().get(i).getClientId() == id) {
 				pirate = myLand.getPirates().get(i);
 			}
 		}
 		
-		if (myLand.getMap()[pirate.getPosX() + posX][pirate.getPosY() + posY] != 0 && pirate.getEnergy() != 0) {
-			if (isEmpty(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
-				pirate.setPosX(pirate.getPosX() + posX);
-				pirate.setPosY(pirate.getPosY() + posY);
-				if (pirate.getEnergy() == 1) {
-					pirate.setStatus(State.DEAD);
+		// Si le pirate n'est pas mort
+		if (!State.DEAD.equals(pirate.getStatus())) {
+			
+			// Si la nouvelle case n'est pas une case d'eau
+			if (myLand.getMap()[pirate.getPosX() + posX][pirate.getPosY() + posY] != 0) {
+				
+				// Si le pirate est saoul
+				if (pirate.getEnergy() > config.getPirateMaxEnergy("monkeys.properties")) {
+					pirate.setStatus(State.DRUNK);
+					int[] randomCell = getRandomCell(pirate);
+					posX = randomCell[0];
+					posY = randomCell[1];
+					
+				} else {
+					pirate.setStatus(State.SOBER);
 				}
+				
+				// S'il n'y a aucun élément sur la prochaine case
+				if (isEmpty(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
+					pirate.setPosX(pirate.getPosX() + posX);
+					pirate.setPosY(pirate.getPosY() + posY);
+				
+				// S'il y a une bouteille de rhum sur la prochaine case
+				} else if (isRum(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
+					Rum rum = findRumSameCellAsPirate(pirate.getPosX() + posX, pirate.getPosY() + posY);
+					
+					pirate.setPosX(pirate.getPosX() + posX);
+					pirate.setPosY(pirate.getPosY() + posY);
+					
+					// Si la bouteille de rhum est visible
+					if (rum.isVisible()) {
+						pirate.setEnergy(pirate.getEnergy() + config.getRum("monkeys.properties").getEnergy());
+						myLand.getRums().get(this.findRumIndex(rum)).setVisible(false);
+						manager.merge(myLand.getRums().get(this.findRumIndex(rum)));
+						com.removeRums();
+						
+						for (Rum r : myLand.getRums()) {
+							if (r.isVisible()) {
+								com.sendRum(r, String.valueOf(r.getId()));
+							}
+						}
+						
+						com.energyIncrease(pirate, String.valueOf(pirate.getClientId()));
+						
+						// Creation du timer de repop des bouteilles
+						updateBottleTimer.createUpdateBottleTimer();
+					}
+					
+				// S'il y a un singe sur la prochaine case	
+				} else if (isMonkey(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
+					pirate.setPosX(pirate.getPosX() + posX);
+					pirate.setPosY(pirate.getPosY() + posY);
+					pirate.setEnergy(1);
+				
+				// S'il y a le trésor sur la prochaine case
+				} else if (isTreasure(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
+					pirate.setPosX(pirate.getPosX() + posX);
+					pirate.setPosY(pirate.getPosY() + posY);
+					myLand.getTreasure().setVisible(true);
+					manager.merge(myLand.getTreasure());
+					com.sendTreasure(myLand.getTreasure(), String.valueOf(myLand.getTreasure().getId()));
+				}
+				
 				pirate.setEnergy(pirate.getEnergy() - 1);
 				
 				manager.merge(pirate);
 				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
 				
+				// Si le déplacement a tué le pirate
 				if (pirate.getEnergy() == 0) {
+					pirate.setStatus(State.DEAD);
 					com.pirateDeath(pirate, String.valueOf(id));
 				}
-				
-			} else if (isRum(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
-				Rum rum = findRumSameCellAsPirate(pirate.getPosX() + posX, pirate.getPosY() + posY);
-				pirate.setPosX(pirate.getPosX() + posX);
-				pirate.setPosY(pirate.getPosY() + posY);
-				if (rum.isVisible()) {
-					pirate.setEnergy(pirate.getEnergy() + config.getRum("monkeys.properties").getEnergy());
-					myLand.getRums().get(this.findRumPosition(rum)).setVisible(false);
-					manager.merge(myLand.getRums().get(this.findRumPosition(rum)));
-					com.removeRums();
-					com.sendRum(myLand.getRums().get(this.findRumPosition(rum)), 
-							String.valueOf(rum.getId()));
-					manager.merge(pirate);
-					com.energyIncrease(pirate, String.valueOf(pirate.getClientId()));
-					com.movePirate(pirate, String.valueOf(pirate.getClientId()));
-				}
-				else {
-					manager.merge(pirate);
-					com.movePirate(pirate, String.valueOf(pirate.getClientId()));
-				}
-				
-			} else if (isMonkey(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
-				pirate.setPosX(pirate.getPosX() + posX);
-				pirate.setPosY(pirate.getPosY() + posY);
-				pirate.setStatus(State.DEAD);
-				pirate.setEnergy(0);
-				manager.merge(pirate);
-				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
-				com.pirateDeath(pirate, String.valueOf(id));
-				
-			} else if (isTreasure(pirate.getPosX() + posX, pirate.getPosY() + posY)) {
-				pirate.setPosX(pirate.getPosX() + posX);
-				pirate.setPosY(pirate.getPosY() + posY);
-				myLand.getTreasure().setVisible(true);
-				manager.merge(myLand.getTreasure());
-				com.sendTreasure(myLand.getTreasure(), String.valueOf(myLand.getTreasure().getId()));
-				manager.merge(pirate);
-				com.movePirate(pirate, String.valueOf(pirate.getClientId()));
 			}
-			
 		}
 	}
 
 	/**
-	 * Configure la nouvelle partie.
+	 * Configure la partie pour le nouveau client.
 	 * @param id
 	 * @throws IOException
 	 */
 	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	private void newGame(int id) throws IOException {
-		/*if (manager.find(Island.class, myLand.getId()) != null) {
+		
+		// Si l'ile n'existe pas dans la BDD on la crée
+		if (manager.find(Island.class, myLand.getId()) == null) {
+			myLand = config.getMap("monkeys.properties");
+			manager.persist(myLand);	
+			
+		// Sinon on récupère ses infos
+		} else {
+			myLand.setId(manager.find(Island.class, myLand.getId()).getId());
+			myLand.setMap(manager.find(Island.class, myLand.getId()).getMap());
 			myLand.setMonkeys(manager.find(Island.class, myLand.getId()).getMonkeys());
 			myLand.setPirates(manager.find(Island.class, myLand.getId()).getPirates());
 			myLand.setRums(manager.find(Island.class, myLand.getId()).getRums());
 			myLand.setTreasure(manager.find(Island.class, myLand.getId()).getTreasure());
-		}*/ if (manager.find(Island.class, myLand.getId()) == null) {
-			myLand = config.getMap("monkeys.properties");
-			manager.persist(myLand);		
 		}
 		
-		/*if (manager.find(Pirate.class, id) != null) {
-			myPirate = manager.find(Pirate.class, id);
-		}*/ if (manager.find(Pirate.class, id) == null) {
+		if (manager.find(Pirate.class, id) == null) {
 			myPirate = config.getPirate("monkeys.properties");
 			myPirate.setClientId(id);
 			randomInit(myPirate);
 			myPirate.setIsland(myLand);
 			manager.persist(myPirate);
 			myLand.getPirates().add(myPirate);
+		} else {
+			myPirate = manager.find(Pirate.class, id);
 		}
 		
-		/*if(myLand.getTreasure() != null) {
-			treasure = manager.find(Treasure.class, myLand.getTreasure().getId());
-		}*/ if(myLand.getTreasure() == null) {
+		if(myLand.getTreasure() == null) {
 			treasure = config.getTreasure();
 			randomInit(treasure);
 			treasure.setIsland(myLand);
@@ -178,6 +212,8 @@ public class MonkeyIsland implements MIRemote {
 		}
 		
 		if (myLand.getMonkeys().isEmpty()) {
+			
+			// Crée le nombre de singe demandé dans le fichier properties
 			for (int i = 0; i < config.getMonkeyNumber("monkeys.properties"); i++) {
 				Monkey monkey = new Monkey();
 				randomInit(monkey);
@@ -188,6 +224,8 @@ public class MonkeyIsland implements MIRemote {
 		}
 		
 		if (myLand.getRums().isEmpty()) {
+			
+			// Crée le nombre de bouteilles demandé dans le fichier properties
 			for (int i = 0 ; i < config.getRumNumber("monkeys.properties"); i++) {
 				Rum rum = config.getRum("monkeys.properties");
 				randomInit(rum);
@@ -215,18 +253,22 @@ public class MonkeyIsland implements MIRemote {
 			iPirates.add(ip.getClientId());
 		}
 		
+		// Supprime les éléments de tous les clients
 		com.removePirates(iPirates);
 		com.removeMonkeys();
 		com.removeRums();
 		
+		// Envoi des pirates
 		for (Pirate p : myLand.getPirates()) {
 			com.sendPirate(p, String.valueOf(p.getClientId()));
 		}
 		
+		// Envoi des singes
 		for (Monkey m : myLand.getMonkeys()) {
 			com.sendMonkey(m, String.valueOf(m.getId()));
 		}
 		
+		// Envoi des bouteilles
 		for (Rum r : myLand.getRums()) {
 			com.sendRum(r, String.valueOf(r.getId()));
 		}
@@ -351,13 +393,84 @@ public class MonkeyIsland implements MIRemote {
 	 * Cherche la position du rum dans la liste
 	 * @param rum
 	 */
-	private int findRumPosition(Rum rum) {
-		int pos = 10000;
+	private int findRumIndex(Rum rum) {
+		Integer index = null;
 		for (int i = 0 ; i < myLand.getRums().size(); i++) {
-			if (rum.equals(myLand.getRums().get(i))) {
-				pos = i;
+			if (rum.getPosX() == myLand.getRums().get(i).getPosX() &&
+					rum.getPosY() == myLand.getRums().get(i).getPosY()) {
+				index = i;
 			}
 		}
-		return pos;
+		return index;
+	}
+	
+	/**
+	 * Si le pirate est ivre, trouve une cellule disponible aléatoirement.
+	 * @param pirate
+	 * @return
+	 */
+	private int[] getRandomCell(Pirate pirate) {
+		List<int[]> possibleMoves = new ArrayList<>();
+		
+		if (availableMove(pirate.getPosX() + 1, pirate.getPosY())) {
+			int[] move = new int[2];
+			move[0] = 1;
+			move[1] = 0;
+			possibleMoves.add(move);
+		}
+		
+		if (availableMove(pirate.getPosX(), pirate.getPosY() + 1)) {
+			int[] move = new int[2];
+			move[0] = 0;
+			move[1] = 1;
+			possibleMoves.add(move);
+		}
+		
+		if (availableMove(pirate.getPosX() - 1, pirate.getPosY())) {
+			int[] move = new int[2];
+			move[0] = -1;
+			move[1] = 0;
+			possibleMoves.add(move);
+		}
+		
+		if (availableMove(pirate.getPosX(), pirate.getPosY() - 1)) {
+			int[] move = new int[2];
+			move[0] = 0;
+			move[1] = -1;
+			possibleMoves.add(move);
+		}
+		
+		
+		if (!possibleMoves.isEmpty()) {
+			Random random = new Random();
+			
+			int index = random.nextInt(possibleMoves.size());
+
+			return possibleMoves.get(index);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Regarde s'il n'y a pas de pirate sur la cellule de destination.
+	 * @param newPosX
+	 * @param newPosY
+	 * @return
+	 */
+	private boolean availableMove(int newPosX, int newPosY) {
+		boolean available = true;
+
+		if (myLand.getMap()[newPosX][newPosY] != 0) {
+			for (Pirate p : myLand.getPirates()) {
+				if (p.getPosX() == newPosX && p.getPosY() == newPosY) {
+					available = false;
+				}
+			}
+		} else {
+			available = false;
+		}
+		
+		return available;
 	}
 }

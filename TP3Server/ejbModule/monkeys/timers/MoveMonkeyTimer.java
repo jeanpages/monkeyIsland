@@ -33,7 +33,7 @@ public class MoveMonkeyTimer {
 		
 	}
 
-	@Schedule(second=" */5 ", minute="*", hour="*", dayOfWeek="*", dayOfMonth="*", month="*", year="*", info="moveMonkeyTimer")
+	@Schedule(second="*/1", minute="*", hour="*", dayOfWeek="*", dayOfMonth="*", month="*", year="*", info="moveMonkeyTimer")
 	private void updateMonkeys() {
 		com.removeMonkeys();
 		for (Monkey m : island.getMonkeys()) {
@@ -92,7 +92,6 @@ public class MoveMonkeyTimer {
 				}
 			}
 		}
-		
 	}
 	
 	private boolean availableMove(int newPosX, int newPosY) {

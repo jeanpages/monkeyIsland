@@ -1,20 +1,31 @@
 package monkeys.timers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
-import javax.ejb.Schedule;
-import javax.ejb.Stateless;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.ejb.TimedObject;
+import javax.ejb.Timer;
+import javax.ejb.TimerConfig;
+import javax.ejb.TimerService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import monkeys.communication.Communication;
 import monkeys.model.Island;
 
-@Stateless
+@Singleton
+@Startup
 @LocalBean
-public class UpdateBottleTimer {
+public class UpdateBottleTimer implements TimedObject {
 	
-	Island island = Island.getInstance();
+	private Island island = Island.getInstance();
+	private List<Integer> ids = new ArrayList<>();
 	
 	@EJB
 	private Communication com;
@@ -22,19 +33,27 @@ public class UpdateBottleTimer {
 	@PersistenceContext(unitName="MonkeysDS")
 	private EntityManager manager;
 
-	public UpdateBottleTimer() {
-		
+	@Resource
+	TimerService timerService;
+	
+	@PostConstruct
+	public void createUpdateBottleTimer() {
+		Timer timer = timerService.createSingleActionTimer(15000, new TimerConfig());
+		ids.add(((int) System.currentTimeMillis()/1000) + 15);
 	}
+	
 
-	@Schedule(second=" */5 ", minute="*", hour="*", dayOfWeek="*", dayOfMonth="*", month="*", year="*", info="updateBottleTimer")
-	private void updateBottles() {
+	@Override
+	public void ejbTimeout(Timer timer) {
 		for (int i = 0; i < island.getRums().size(); i++) {
-			if (!island.getRums().get(i).isVisible()) {
-				island.getRums().get(i).setVisible(true);
-				manager.merge(island.getRums().get(i));
-				com.sendRum(island.getRums().get(i), String.valueOf(island.getRums().get(i).getId()));
+			for (int j = ids.size() - 1; j >= 0; j--) {
+				if (!island.getRums().get(i).isVisible() && ids.get(j) == ((int) System.currentTimeMillis()/1000)) {
+					island.getRums().get(i).setVisible(true);
+					manager.merge(island.getRums().get(i));
+					com.sendRum(island.getRums().get(i), String.valueOf(island.getRums().get(i).getId()));
+					ids.remove(j);
+				}
 			}
 		}
 	}
-	
 }

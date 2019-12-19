@@ -18,11 +18,11 @@ public class Monkey extends Element {
 	public void setIsland(Island islandMonkey) {
 		this.islandMonkey = islandMonkey;
 	}
-	
-	public Monkey() {}
 
 	@Override
 	public String toString() {
-		return "Monkey [getId()=" + getId() + ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
+		return "Monkey [" + super.toString() + "]";
 	}
+
+	
 }

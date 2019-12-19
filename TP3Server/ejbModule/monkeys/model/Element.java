@@ -59,7 +59,7 @@ public abstract class Element implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Element [id=" + id + ", posX=" + posX + ", posY=" + posY + "]";
+		return "id=" + id + ", posX=" + posX + ", posY=" + posY;
 	}
 	
 	

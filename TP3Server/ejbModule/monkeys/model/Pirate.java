@@ -23,8 +23,6 @@ public class Pirate extends Element {
 		this.islandPirate = islandPirate;
 	}
 	
-	public Pirate() {}
-	
 	public int getClientId() {
 		return clientId;
 	}
@@ -51,9 +49,8 @@ public class Pirate extends Element {
 
 	@Override
 	public String toString() {
-		return "Pirate [id=" + getClientId() + "getStatus()=" + getStatus() + ", getEnergy()=" + getEnergy()
-				+ ", getId()=" + getId() + ", getPosX()=" + getPosX() + ", getPosY()=" + getPosY() + "]";
+		return "Pirate [clientId=" + clientId + ", status=" + status + ", energy=" + energy + ", " + super.toString() + "]";
 	}
-	
+
 	
 }

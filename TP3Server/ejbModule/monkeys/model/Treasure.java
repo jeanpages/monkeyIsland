@@ -17,8 +17,6 @@ public class Treasure extends Element{
 	@OneToOne(mappedBy="treasure", fetch=FetchType.EAGER, orphanRemoval = true)
 	private Island islandTreasure;
 	
-	public Treasure() {}
-	
 	public Island getIsland() {
 		return this.islandTreasure;
 	}
@@ -26,12 +24,7 @@ public class Treasure extends Element{
 	public void setIsland(Island islandTreasure) {
 		this.islandTreasure = islandTreasure;
 	}
-	
-	
-	/**
-	 * 
-	 * @return hidden
-	 */
+
 	public boolean isVisible() {
 		return visible;
 	}
@@ -42,8 +35,7 @@ public class Treasure extends Element{
 
 	@Override
 	public String toString() {
-		return "Treasure [isHidden()=" + isVisible() + ", getId()=" + getId() + ", getPosX()=" + getPosX()
-				+ ", getPosY()=" + getPosY() + "]";
+		return "Treasure [visible=" + visible + super.toString() + "]";
 	}
 
 	
