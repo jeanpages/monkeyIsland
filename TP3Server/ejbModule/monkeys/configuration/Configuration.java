@@ -38,7 +38,7 @@ public class Configuration implements ConfigurationLocal {
 		
 		String[] lines = mapProperties.split(";");
 		
-		int[][] map = new int[10][10];
+		int[][] map = new int[lines.length][lines.length];
 		
 		for (int i = 0; i < lines.length; i++) {
 			for (int j = 0; j < lines[i].split(",").length; j++) {
